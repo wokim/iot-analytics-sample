@@ -1,0 +1,11 @@
+{
+    "files.exclude": {
+        "**/.DS_Store": true,
+        "**/node_modules": true,
+        "cdk.out": true,
+        "lib/*.js": true,
+        "lib/*.d.ts": true,
+        "bin/*.js": true,
+        "bin/*.d.ts": true
+    }
+}
