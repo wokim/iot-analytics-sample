@@ -3,6 +3,7 @@ import * as iotanalytics from '@aws-cdk/aws-iotanalytics';
 import * as iot from '@aws-cdk/aws-iot';
 import { Role, ServicePrincipal, PolicyStatement, Effect } from '@aws-cdk/aws-iam';
 import * as s3 from '@aws-cdk/aws-s3';
+import { CfnDataset } from '@aws-cdk/aws-iotanalytics';
 
 export class IotAnalyticsSampleStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -66,11 +67,11 @@ export class IotAnalyticsSampleStack extends cdk.Stack {
     const store = new iotanalytics.CfnDatastore(this, 'SampleStoreId', {
       datastoreName: 'sample_datastore',
       // When you use data partitioning to organize data, you can query on pruned data. This decreases the amount of data scanned per query and improves latency.
-      datastorePartitions: {
-        partitions: [{
-          timestampPartition: {attributeName: '__partition_', timestampFormat: 'yyyy-MM-dd HH:mm:ss'}
-        }]
-      },
+      // datastorePartitions: {
+      //   partitions: [{
+      //     timestampPartition: {attributeName: '__partition_', timestampFormat: 'yyyy-MM-dd HH:mm:ss'}
+      //   }]
+      // },
       datastoreStorage: {
         customerManagedS3: {
           bucket: dataStoreBucket.bucketName,
@@ -114,6 +115,16 @@ export class IotAnalyticsSampleStack extends cdk.Stack {
           }
         }]
       }
+    });
+
+    new iotanalytics.CfnDataset(this, 'SampleDatasetId', {
+      datasetName: 'sample_dataset',
+      actions: [{
+        actionName: 'select_action',
+        queryAction: {
+          sqlQuery: `select * from ${store.datastoreName}`
+        }
+      }]
     });
   }
 }
