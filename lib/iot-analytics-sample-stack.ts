@@ -130,21 +130,41 @@ export class IotAnalyticsSampleStack extends cdk.Stack {
       }
     });
 
+    const datasetBucket = new s3.Bucket(this, 'SampleDatasetBucketId', {
+      bucketName: 'sample-xx-dataset-bucket'
+    });
+    const datasetRole = (new Role(this, 'SampleDatasetRole', {
+      roleName: 'SampleIoTAnalyticsDatasetRole',
+      assumedBy: new ServicePrincipal('iotanalytics.amazonaws.com'),
+    }));
+    datasetRole.addToPolicy(new PolicyStatement({
+      effect: Effect.ALLOW,
+      actions: ['s3:GetObject', 's3:GetBucketLocation', 's3:ListBucket', 's3:PutObject'],
+      resources: [datasetBucket.bucketArn, `${datasetBucket.bucketArn}/*`],
+    }));
+
     new iotanalytics.CfnDataset(this, 'SampleDatasetId', {
       datasetName: 'sample_dataset',
       actions: [{
         actionName: 'select_action',
         queryAction: {
-          // "{\"deviceid\":\"$DEVICE\",\"current_ts\":$CURRENT_TS,\"flow\":$FLOW,\"temp\":$TEMP,\"humidity\":$HUMIDITY,\"vibration\":$VIBRATION}"
-          // SELECT current_timestamp dtts, deviceid, avg(temp) avg_temp, avg(flow) avg_flow, avg(humidity)  avg_humidity, avg(vibration) avg_vibration FROM aks_datalake_silver_iota_datastore where   from_unixtime(cast(current_ts as double)) > current_timestamp - interval '5' minute group by deviceid
-          sqlQuery: `SELECT * from ${store.datastoreName}`
+          // sqlQuery: `SELECT current_timestamp dtts, deviceid, avg(temperature) avg_temp, avg(aqi) avg_aqi, avg(humidity) avg_humidity, avg(fan_level) avg_fan_level, sum(purify_volume) sum_purify_volume FROM ${store.datastoreName} where from_unixtime(cast(current_ts as double)) > current_timestamp - interval '1' minute group by deviceid`
+          sqlQuery: `SELECT current_timestamp dtts, deviceid, temperature, aqi, humidity, fan_level, purify_volume FROM ${store.datastoreName} where from_unixtime(cast(current_ts as double)) > current_timestamp - interval '60' minute`
         }
       }],
+      // triggers: [
+      //   {schedule: {scheduleExpression: 'cron(0/1 * * * ? *)'}}
+      // ],
       // contentDeliveryRules: [{
       //   destination: {
-      //     iotEventsDestinationConfiguration: {
-      //       inputName: 'xxx',
-      //       roleArn: 'yyy'
+      //     s3DestinationConfiguration: {
+      //       bucket: datasetBucket.bucketName,
+      //       key: 'datalake_db/device_telemetry_stats/!{iotanalytics:scheduleTime}_!{iotanalytics:versionId}.csv',
+      //       glueConfiguration: {
+      //         tableName: 'device_telemetry_stats',
+      //         databaseName: 'datalake_db'
+      //       },
+      //       roleArn: datasetRole.roleArn
       //     }
       //   }
       // }]
