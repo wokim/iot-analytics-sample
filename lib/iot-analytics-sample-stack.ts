@@ -3,7 +3,6 @@ import * as iotanalytics from '@aws-cdk/aws-iotanalytics';
 import * as iot from '@aws-cdk/aws-iot';
 import { Role, ServicePrincipal, PolicyStatement, Effect } from '@aws-cdk/aws-iam';
 import * as s3 from '@aws-cdk/aws-s3';
-import { CfnDataset } from '@aws-cdk/aws-iotanalytics';
 
 export class IotAnalyticsSampleStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -124,7 +123,15 @@ export class IotAnalyticsSampleStack extends cdk.Stack {
         queryAction: {
           sqlQuery: `select * from ${store.datastoreName}`
         }
-      }]
+      }],
+      // contentDeliveryRules: [{
+      //   destination: {
+      //     iotEventsDestinationConfiguration: {
+      //       inputName: 'xxx',
+      //       roleArn: 'yyy'
+      //     }
+      //   }
+      // }]
     });
   }
 }
