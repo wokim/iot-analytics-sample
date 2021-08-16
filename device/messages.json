@@ -1,0 +1,62 @@
+[
+    {
+        "temperature": 20.9,
+        "power": "On",
+        "aqi": 8,
+        "humidity": 50,
+        "fan_level": 2,
+        "filter_hours_used": 43,
+        "filter_life_remaining": 98,
+        "motor_speed": 1262,
+        "purify_volume": 5182,
+        "use_time": 156000
+    },
+    {
+        "temperature": 21.3,
+        "power": "On",
+        "aqi": 25,
+        "humidity": 53,
+        "fan_level": 5,
+        "filter_hours_used": 44,
+        "filter_life_remaining": 96,
+        "motor_speed": 2362,
+        "purify_volume": 6016,
+        "use_time": 158200
+    },
+    {
+        "temperature": 24.3,
+        "power": "On",
+        "aqi": 20,
+        "humidity": 72,
+        "fan_level": 4,
+        "filter_hours_used": 46,
+        "filter_life_remaining": 92,
+        "motor_speed": 2162,
+        "purify_volume": 5900,
+        "use_time": 161200
+    },
+    {
+        "temperature": 19.3,
+        "power": "On",
+        "aqi": 20,
+        "humidity": 40,
+        "fan_level": 1,
+        "filter_hours_used": 48,
+        "filter_life_remaining": 85,
+        "motor_speed": 962,
+        "purify_volume": 4092,
+        "use_time": 164200
+    },
+    {
+        "temperature": 19.3,
+        "power": "Off",
+        "aqi": 12,
+        "humidity": 42,
+        "fan_level": 0,
+        "filter_hours_used": 52,
+        "filter_life_remaining": 74,
+        "motor_speed": 0,
+        "purify_volume": 0,
+        "use_time": 164200
+    }
+]

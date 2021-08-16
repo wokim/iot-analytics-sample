@@ -1,9 +1,20 @@
-
 import { mqtt, auth, http, io, iot } from 'aws-iot-device-sdk-v2';
+const messages: [{
+    temperature: number,
+    power: string, // On or Off
+    aqi: number,
+    humidity: number,
+    fan_level: number, // 0 - 10
+    filter_hours_used: number,
+    filter_life_remaining: number,
+    motor_speed: number,
+    purify_volume: number,
+    use_time: number
+}] = require('./messages.json');
 
 (async () => {
     try {
-        io.enable_logging(io.LogLevel.DEBUG);
+        io.enable_logging(io.LogLevel.ERROR);
         const client_bootstrap = new io.ClientBootstrap();
         const config_builder = iot.AwsIotMqttConnectionConfigBuilder.new_mtls_builder_from_path('air-purifier-mask.cert.pem', 'air-purifier-mask.private.key');
         config_builder.with_certificate_authority_from_path(undefined, 'root-CA.crt');
@@ -19,17 +30,17 @@ import { mqtt, auth, http, io, iot } from 'aws-iot-device-sdk-v2';
         console.log('Connected!');
 
         // publish messages
-        const msg = {
-            message: 'world',
-            sequence: 1
-        };
-        console.log('Publishing messages...');
-        await connection.publish('test/topic', JSON.stringify(msg), mqtt.QoS.AtLeastOnce);
-        console.log('Published!');
+        messages.forEach((msg, index) => {
+            setTimeout(async () => {
+                console.log(`Publishing messages...${index}`);
+                await connection.publish('air-purifier-mask/1', JSON.stringify(msg), mqtt.QoS.AtLeastOnce);
+                console.log(`Published! ${index}`);
+            }, 1000 * index);
+        });
 
-        console.log('Disconnecting...');
+        // console.log('Disconnecting...');
         // await connection.disconnect();
-        console.log('Disconnected!');
+        // console.log('Disconnected!');
     } catch (e) {
         console.log(e);
     }
