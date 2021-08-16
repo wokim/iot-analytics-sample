@@ -32,9 +32,11 @@ const messages: [{
         // publish messages
         messages.forEach((msg, index) => {
             setTimeout(async () => {
-                console.log(`Publishing messages...${index}`);
-                await connection.publish('air-purifier-mask/1', JSON.stringify(msg), mqtt.QoS.AtLeastOnce);
+                const topic = 'air-purifier-mask/1';
+                console.log(`Publishing messages into ${topic}...${index}`);
+                await connection.publish(topic, JSON.stringify(msg), mqtt.QoS.AtLeastOnce);
                 console.log(`Published! ${index}`);
+                if (index + 1 === messages.length) console.log(`Published all messages`);
             }, 1000 * index);
         });
 
