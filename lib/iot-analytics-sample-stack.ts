@@ -40,13 +40,27 @@ export class IotAnalyticsSampleStack extends cdk.Stack {
     const dataStoreBucket = new s3.Bucket(this, 'SampleDataStoreBucketId', {
       bucketName: 'sample-data-store-bucket'
     });
+    dataStoreBucket.addToResourcePolicy(new PolicyStatement({
+      effect: Effect.ALLOW,
+      actions: [
+        's3:GetObject',
+        's3:GetBucketLocation',
+        's3:ListBucket',
+        's3:ListBucketMultipartUploads',
+        's3:ListMultipartUploadParts',
+        's3:AbortMultipartUpload',
+        's3:PutObject',
+        's3:DeleteObject'
+      ],
+      principals: [new ServicePrincipal('iotanalytics.amazonaws.com')],
+      resources: [dataStoreBucket.bucketArn, `${dataStoreBucket.bucketArn}/*`],
+    }));
 
     const dataStoreRole = (new Role(this, 'SampleDataStoreRole', {
       roleName: 'SampleIoTAnalyticsDataStoreRole',
       assumedBy: new ServicePrincipal('iotanalytics.amazonaws.com'),
     }));
     dataStoreRole.addToPolicy(new PolicyStatement({
-      sid: 'SampleDataStoreStatementId',
       effect: Effect.ALLOW,
       actions: [
         's3:GetObject',
@@ -60,7 +74,7 @@ export class IotAnalyticsSampleStack extends cdk.Stack {
       ],
       resources: [dataStoreBucket.bucketArn, `${dataStoreBucket.bucketArn}/*`],
     }));
-
+    
     // A data store receives and stores messages. the data store file format is JSON by default.
     // Processed data store messages are stored in an Amazon S3 bucket managed by AWS IoT Analytics.
     const store = new iotanalytics.CfnDatastore(this, 'SampleStoreId', {
@@ -104,7 +118,7 @@ export class IotAnalyticsSampleStack extends cdk.Stack {
     new iot.CfnTopicRule(this, 'SampleTopicRuleId', {
       ruleName: 'sample_topic_rule',
       topicRulePayload: {
-        sql: 'SELECT * FROM \'iot/test\'',
+        sql: 'SELECT * FROM \'air-purifier-mask/#\'',
         ruleDisabled: false,
         awsIotSqlVersion: '2016-03-23',
         actions: [{
@@ -121,7 +135,9 @@ export class IotAnalyticsSampleStack extends cdk.Stack {
       actions: [{
         actionName: 'select_action',
         queryAction: {
-          sqlQuery: `select * from ${store.datastoreName}`
+          // "{\"deviceid\":\"$DEVICE\",\"current_ts\":$CURRENT_TS,\"flow\":$FLOW,\"temp\":$TEMP,\"humidity\":$HUMIDITY,\"vibration\":$VIBRATION}"
+          // SELECT current_timestamp dtts, deviceid, avg(temp) avg_temp, avg(flow) avg_flow, avg(humidity)  avg_humidity, avg(vibration) avg_vibration FROM aks_datalake_silver_iota_datastore where   from_unixtime(cast(current_ts as double)) > current_timestamp - interval '5' minute group by deviceid
+          sqlQuery: `SELECT * from ${store.datastoreName}`
         }
       }],
       // contentDeliveryRules: [{
