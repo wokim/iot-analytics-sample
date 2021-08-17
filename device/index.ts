@@ -2,6 +2,8 @@ import { mqtt, auth, http, io, iot } from 'aws-iot-device-sdk-v2';
 import { random } from 'lodash';
 
 const messages: [{
+    deviceid: string,
+    current_ts: string, // current timestamp
     temperature: number,
     power: string, // On or Off
     aqi: number,
@@ -34,15 +36,10 @@ const messages: [{
         // publish messages
         for (let index = 0; index < 1000; index++) {
             setTimeout(async () => {
-                let temperature = random(0, 20) + 15;
-                // 3% chance of throwing an anomalous temperature reading
-                if (random(0, 100) > 97) {
-                    temperature *= 3;
-                }
                 const msg = {
                     deviceid: `P0${random(1, 5)}`,
                     current_ts: Math.floor(+new Date() / 1000),
-                    temperature,
+                    temperature: random(0, 20) + 15,
                     aqi: random(1, 100),
                     humidity: random(0, 40) + 50,
                     fan_level: random(1, 10),
