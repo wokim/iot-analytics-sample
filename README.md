@@ -1,14 +1,26 @@
-# Welcome to your CDK TypeScript project!
+# IoT Anaytics Sample
 
-This is a blank project for TypeScript development with CDK.
+This project is demo to build a minimal system that collects and analyzes usage data of wearable masks with air-purifier from each end-user.
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+## High Level Design
 
-## Useful commands
+* Microcontroller based air-purifier mask is connected to the mobile device via Bluetooth LE.
+* The mobile device can publish and subscribe to messages using MQTT protocol with AWS IoT Core.
+* Create a AWS IoT rule to flow any data matching the rule through AWS IoT Analytics data store.
+  * Pipeline activities connect a channel to a data store and process messages.
+  * Create a dataset to query the data using SQL expressions
 
- * `npm run build`   compile typescript to js
- * `npm run watch`   watch for changes and compile
- * `npm run test`    perform the jest unit tests
- * `cdk deploy`      deploy this stack to your default AWS account/region
- * `cdk diff`        compare deployed stack with current state
- * `cdk synth`       emits the synthesized CloudFormation template
+## How To Run
+
+```sh
+# Provision IoT topic rules, channel, datastore, and dataset
+$ cdk deploy
+
+# Run demo device to publish messages to AWS IoT Core using MQTT protocol
+$ cd device
+$ npm run start
+```
+
+## Licenses
+
+N/A
